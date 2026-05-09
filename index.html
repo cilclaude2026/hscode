@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0b1020" />
+<title>🌐 전세계 HS Code 검색</title>
+<link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkhTIENvZGUiLAogICJzaG9ydF9uYW1lIjogIkhTIENvZGUiLAogICJzdGFydF91cmwiOiAiLi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwYjEwMjAiLAogICJ0aGVtZV9jb2xvciI6ICIjMGIxMDIwIgp9" />
+<style>
+  *,*::before,*::after { box-sizing: border-box; }
+  :root { color-scheme: dark; }
+  html, body { margin: 0; padding: 0; min-height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", Roboto, sans-serif;
+    background:
+      radial-gradient(900px 500px at 80% -10%, rgba(59,130,246,.18), transparent 60%),
+      radial-gradient(700px 400px at -10% 10%, rgba(139,92,246,.15), transparent 60%),
+      #0b1020;
+    color: #e5e7eb;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 24px 16px 80px; }
+  header h1 { margin: 6px 0 4px; font-size: 24px; }
+  header p { margin: 0 0 16px; font-size: 13px; color: #94a3b8; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px;
+          background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); font-size: 11px; color: #cbd5e1; }
+  .dot { width: 6px; height: 6px; border-radius: 999px; background: #34d399; }
+  .glass {
+    background: rgba(17,24,39,.55);
+    border: 1px solid rgba(148,163,184,.15);
+    border-radius: 16px;
+    padding: 16px;
+    backdrop-filter: blur(10px);
+  }
+  textarea {
+    width: 100%; min-height: 76px; resize: vertical; padding: 14px;
+    background: rgba(2,6,23,.55); color: #fff; border: 1px solid rgba(255,255,255,.1);
+    border-radius: 12px; font-size: 16px; font-family: inherit;
+  }
+  textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.25); }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .row.between { justify-content: space-between; }
+  .label { font-size: 13px; color: #cbd5e1; margin: 14px 0 8px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 11px; border-radius: 999px; font-size: 13px;
+    background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+    color: #cbd5e1; cursor: pointer; user-select: none;
+  }
+  .chip.active { background: rgba(37,99,235,.25); border-color: #3b82f6; color: #fff; }
+  .chip .digits { font-size: 11px; color: #94a3b8; }
+  .ex { display: inline-block; padding: 4px 8px; border-radius: 8px; background: rgba(255,255,255,.04);
+        border: 1px solid rgba(255,255,255,.08); font-size: 12px; color: #cbd5e1; cursor: pointer; }
+  .btn-link { background: transparent; border: 1px solid rgba(255,255,255,.1); color: #cbd5e1;
+              border-radius: 8px; padding: 5px 10px; font-size: 12px; cursor: pointer; }
+  .submit {
+    width: 100%; margin-top: 14px; padding: 14px; border-radius: 14px; border: 0; color: #fff;
+    background: linear-gradient(135deg,#2563eb,#7c3aed); font-size: 16px; font-weight: 600;
+    box-shadow: 0 10px 30px -10px rgba(37,99,235,.6); cursor: pointer;
+  }
+  .submit:disabled { opacity: .5; cursor: not-allowed; }
+  .result { margin-top: 16px; }
+  .hs-pill { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .04em;
+             background: rgba(37,99,235,.2); color: #dbeafe; padding: 8px 12px; border-radius: 10px;
+             font-size: 22px; font-weight: 700; }
+  .field { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+           border-radius: 10px; padding: 10px; }
+  .field .k { font-size: 11px; color: #94a3b8; }
+  .field .v { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; margin-top: 2px; }
+  .grid4 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+  @media (min-width: 520px) { .grid4 { grid-template-columns: repeat(4, 1fr); } }
+  .bar { height: 6px; background: rgba(255,255,255,.1); border-radius: 999px; overflow: hidden; margin-top: 6px; }
+  .bar > i { display: block; height: 100%; background: #34d399; }
+  table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 13px; }
+  th, td { text-align: left; padding: 10px 6px; vertical-align: top; border-bottom: 1px solid rgba(255,255,255,.06); }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: #94a3b8; }
+  .code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+          background: rgba(255,255,255,.06); padding: 3px 6px; border-radius: 6px; }
+  .alt-li { display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; padding: 8px;
+            background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06);
+            border-radius: 10px; margin-top: 6px; font-size: 13px; }
+  .warn { color: #fbbf24; font-size: 12px; margin-top: 8px; }
+  footer { margin-top: 28px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.08);
+           text-align: center; font-size: 11px; color: #64748b; }
+  .empty { text-align: center; color: #94a3b8; font-size: 13px; margin-top: 20px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="row between" style="margin-bottom:14px">
+    <span class="pill"><span class="dot"></span><span id="modeLabel">사전 모드 · 0 KB · 무료</span></span>
+    <button id="langBtn" class="btn-link">EN</button>
+  </div>
+
+  <header>
+    <h1 id="title">🌐 전세계 HS Code 검색</h1>
+    <p id="subtitle">제품 설명을 입력하면 국제 6자리 HS 코드와 국가별 자릿수 코드를 추정해 드립니다.</p>
+  </header>
+
+  <section class="glass">
+    <textarea id="q" placeholder="예: 무선 블루투스 이어폰, 즉석 라면, 스테인리스 텀블러…"></textarea>
+
+    <div class="label" id="countriesLabel">비교할 국가 (<span id="cntCnt">0</span>)</div>
+    <div class="row between" style="margin-bottom:8px">
+      <div></div>
+      <div style="display:flex;gap:6px">
+        <button class="btn-link" id="selAll">전체</button>
+        <button class="btn-link" id="selNone">초기화</button>
+      </div>
+    </div>
+    <div class="chips" id="countries"></div>
+
+    <div class="label" id="examplesLabel">추천 예시</div>
+    <div class="chips" id="examples"></div>
+
+    <button class="submit" id="goBtn">🔎 검색</button>
+  </section>
+
+  <div id="empty" class="empty">제품을 자세히 적을수록(재질·용도·브랜드) 정확도가 올라갑니다.</div>
+  <div id="result" class="result" hidden></div>
+
+  <footer>HS 2022 · WCO 6자리 기준 · 본 도구는 보조용입니다. 실제 통관은 관세 당국 확인 필요.</footer>
+</div>
+
+<script>
+const COUNTRIES = [
+  { code:"KR", name:"South Korea",   nameKo:"대한민국",   digits:10, schedule:"HSK",       authority:"관세청",                flag:"🇰🇷" },
+  { code:"US", name:"United States", nameKo:"미국",       digits:10, schedule:"HTSUS",     authority:"USITC",                 flag:"🇺🇸" },
+  { code:"CN", name:"China",         nameKo:"중국",       digits:13, schedule:"CN HS",     authority:"GACC",                  flag:"🇨🇳" },
+  { code:"JP", name:"Japan",         nameKo:"일본",       digits:9,  schedule:"Japan HS",  authority:"日本税関",               flag:"🇯🇵" },
+  { code:"EU", name:"European Union",nameKo:"유럽연합",   digits:8,  schedule:"CN Code",   authority:"EC TARIC",              flag:"🇪🇺" },
+  { code:"DE", name:"Germany",       nameKo:"독일",       digits:11, schedule:"TARIC",     authority:"Zoll",                  flag:"🇩🇪" },
+  { code:"GB", name:"United Kingdom",nameKo:"영국",       digits:10, schedule:"UK Tariff", authority:"HMRC",                  flag:"🇬🇧" },
+  { code:"VN", name:"Vietnam",       nameKo:"베트남",     digits:8,  schedule:"Vietnam HS",authority:"Vietnam Customs",       flag:"🇻🇳" },
+  { code:"IN", name:"India",         nameKo:"인도",       digits:8,  schedule:"ITC-HS",    authority:"DGFT",                  flag:"🇮🇳" },
+  { code:"AU", name:"Australia",     nameKo:"호주",       digits:8,  schedule:"AHECC",     authority:"ABF",                   flag:"🇦🇺" },
+  { code:"CA", name:"Canada",        nameKo:"캐나다",     digits:10, schedule:"CCT",       authority:"CBSA",                  flag:"🇨🇦" },
+  { code:"MX", name:"Mexico",        nameKo:"멕시코",     digits:8,  schedule:"TIGIE",     authority:"SAT",                   flag:"🇲🇽" },
+  { code:"BR", name:"Brazil",        nameKo:"브라질",     digits:8,  schedule:"NCM",       authority:"Receita Federal",       flag:"🇧🇷" },
+  { code:"TH", name:"Thailand",      nameKo:"태국",       digits:11, schedule:"AHTN",      authority:"Thai Customs",          flag:"🇹🇭" },
+  { code:"SG", name:"Singapore",     nameKo:"싱가포르",   digits:8,  schedule:"AHTN",      authority:"Singapore Customs",     flag:"🇸🇬" },
+];
+
+const HS_DB = [
+  { hs6:"020110", titleKo:"쇠고기 (신선·냉장)", title:"Bovine, fresh/chilled", chapter:"02",
+    kw:["beef","bovine","fresh beef"], kwKo:["쇠고기","소고기","한우","신선육"] },
+  { hs6:"030214", titleKo:"연어 (신선·냉장)", title:"Atlantic salmon, fresh", chapter:"03",
+    kw:["salmon","atlantic salmon"], kwKo:["연어","생연어","노르웨이연어"] },
+  { hs6:"040120", titleKo:"우유 (지방 1~6%)", title:"Milk, fat 1-6%", chapter:"04",
+    kw:["milk","dairy","fresh milk"], kwKo:["우유","저지방우유"] },
+  { hs6:"070960", titleKo:"고추·피망 (신선)", title:"Peppers (Capsicum) fresh", chapter:"07",
+    kw:["pepper","capsicum","chili","bell pepper"], kwKo:["고추","피망","파프리카","청양고추"] },
+  { hs6:"080390", titleKo:"바나나 (신선·건조)", title:"Bananas, fresh/dried", chapter:"08",
+    kw:["banana"], kwKo:["바나나"] },
+  { hs6:"090111", titleKo:"커피 생두 (카페인 함유)", title:"Coffee, not roasted", chapter:"09",
+    kw:["coffee","green coffee","raw coffee","coffee bean"], kwKo:["커피","원두","생두"] },
+  { hs6:"090121", titleKo:"볶은 원두 커피", title:"Coffee, roasted", chapter:"09",
+    kw:["roasted coffee","espresso"], kwKo:["볶은커피","로스팅원두","에스프레소","원두커피"] },
+  { hs6:"090122", titleKo:"디카페인 볶은 커피", title:"Coffee, roasted, decaffeinated", chapter:"09",
+    kw:["decaf","decaffeinated"], kwKo:["디카페인","카페인제거","디카페인커피"] },
+  { hs6:"090230", titleKo:"홍차 (3kg 이하 포장)", title:"Black tea, ≤3kg", chapter:"09",
+    kw:["black tea","tea","fermented tea"], kwKo:["홍차","차","티백"] },
+  { hs6:"100630", titleKo:"쌀 (정미)", title:"Milled rice", chapter:"10",
+    kw:["rice","milled rice","white rice"], kwKo:["쌀","백미","정미","찹쌀"] },
+  { hs6:"180690", titleKo:"초콜릿·코코아 가공품", title:"Chocolate & cocoa preparations", chapter:"18",
+    kw:["chocolate","cocoa","candy"], kwKo:["초콜릿","초코","코코아","쵸콜릿"] },
+  { hs6:"190230", titleKo:"즉석면·라면 (조리·가공)", title:"Pasta cooked (incl. instant noodles)", chapter:"19",
+    kw:["instant noodle","ramen","noodle","pasta"], kwKo:["라면","즉석면","컵라면","면","라멘"] },
+  { hs6:"200599", titleKo:"채소 절임·가공 (김치 포함)", title:"Prepared vegetables (incl. kimchi)", chapter:"20",
+    kw:["kimchi","pickled vegetable","fermented"], kwKo:["김치","포기김치","절임채소","발효채소"] },
+  { hs6:"220210", titleKo:"탄산음료 (당·향료)", title:"Carbonated soft drinks", chapter:"22",
+    kw:["soda","soft drink","cola","carbonated"], kwKo:["탄산음료","콜라","사이다","음료수"] },
+  { hs6:"300490", titleKo:"기타 의약품 (소매 포장)", title:"Other medicaments, retail", chapter:"30",
+    kw:["medicine","drug","tablet","pharmaceutical"], kwKo:["의약품","약","정제","의약"] },
+  { hs6:"330499", titleKo:"기초 화장품 (스킨케어)", title:"Skincare preparations", chapter:"33",
+    kw:["cream","skincare","lotion","serum","moisturizer","cosmetic"], kwKo:["크림","로션","스킨","에센스","세럼","기초화장품","스킨케어"] },
+  { hs6:"330510", titleKo:"샴푸", title:"Shampoos", chapter:"33",
+    kw:["shampoo","hair wash"], kwKo:["샴푸","헤어샴푸"] },
+  { hs6:"330741", titleKo:"향초·실내 향수", title:"Scented candles & room sprays", chapter:"33",
+    kw:["candle","incense","fragrance","scented"], kwKo:["향초","캔들","방향제","디퓨저"] },
+  { hs6:"392329", titleKo:"플라스틱 봉투·자루", title:"Plastic sacks & bags", chapter:"39",
+    kw:["plastic bag","plastic pouch","packaging bag"], kwKo:["비닐봉지","플라스틱백","지퍼백","포장봉지"] },
+  { hs6:"392690", titleKo:"기타 플라스틱 제품 (보호필름 등)", title:"Other plastic articles", chapter:"39",
+    kw:["screen protector","plastic film","phone case plastic"], kwKo:["보호필름","휴대폰필름","스크린필름"] },
+  { hs6:"401110", titleKo:"승용차용 신품 공기 타이어", title:"New tyres for cars", chapter:"40",
+    kw:["car tire","passenger tire","pneumatic tyre"], kwKo:["타이어","승용차타이어","자동차타이어"] },
+  { hs6:"420221", titleKo:"가죽 핸드백", title:"Handbags, leather", chapter:"42",
+    kw:["handbag","leather bag","purse"], kwKo:["핸드백","가죽가방","여성가방","백"] },
+  { hs6:"420292", titleKo:"배낭·트래블백 (플라스틱·섬유)", title:"Backpacks/travel bags", chapter:"42",
+    kw:["backpack","travel bag","rucksack"], kwKo:["백팩","배낭","여행가방","캐리어"] },
+  { hs6:"490199", titleKo:"도서·서적 (기타)", title:"Printed books", chapter:"49",
+    kw:["book","novel","textbook","printed"], kwKo:["책","도서","서적","단행본","교과서"] },
+  { hs6:"610910", titleKo:"면 티셔츠 (편직)", title:"Cotton T-shirts, knitted", chapter:"61",
+    kw:["t-shirt","tshirt","cotton tee","tee"], kwKo:["티셔츠","면티","반팔","티"] },
+  { hs6:"620342", titleKo:"남성용 면바지·청바지", title:"Men's cotton trousers/jeans", chapter:"62",
+    kw:["jeans","trousers","men pants","denim"], kwKo:["청바지","남성바지","데님","면바지"] },
+  { hs6:"640299", titleKo:"기타 신발 (고무·플라스틱 외피)", title:"Other footwear, rubber/plastic", chapter:"64",
+    kw:["shoes","sneakers","footwear","trainers"], kwKo:["신발","운동화","스니커즈","슈즈"] },
+  { hs6:"700721", titleKo:"강화유리 (기타)", title:"Tempered safety glass, other", chapter:"70",
+    kw:["tempered glass","safety glass","screen glass"], kwKo:["강화유리","강화유리필름"] },
+  { hs6:"701090", titleKo:"유리병·항아리 (포장용)", title:"Glass bottles & jars", chapter:"70",
+    kw:["glass bottle","glass jar"], kwKo:["유리병","유리용기","유리항아리"] },
+  { hs6:"732393", titleKo:"스테인리스 식기·주방용품·텀블러", title:"Stainless steel kitchenware/tumbler", chapter:"73",
+    kw:["stainless tumbler","stainless cup","stainless steel cup","kitchenware"], kwKo:["스테인리스","스텐","텀블러","스테인레스컵","스텐주방용품"] },
+  { hs6:"847130", titleKo:"노트북 (휴대용 컴퓨터, ≤10kg)", title:"Laptops, ≤10 kg", chapter:"84",
+    kw:["laptop","notebook","portable computer"], kwKo:["노트북","랩탑","휴대용컴퓨터"] },
+  { hs6:"850440", titleKo:"전원 어댑터·충전기·인버터", title:"Power adapters, chargers, inverters", chapter:"85",
+    kw:["adapter","charger","power supply","inverter"], kwKo:["어댑터","충전기","전원공급장치","인버터","아답터"] },
+  { hs6:"850760", titleKo:"리튬이온 배터리·축전지", title:"Lithium-ion accumulators", chapter:"85",
+    kw:["lithium ion","li-ion","ev battery","battery cell"], kwKo:["리튬이온배터리","리튬이온","전기차배터리","배터리셀"] },
+  { hs6:"851712", titleKo:"스마트폰·휴대전화", title:"Smartphones, cellular phones", chapter:"85",
+    kw:["smartphone","mobile phone","cellphone","iphone","android phone"], kwKo:["스마트폰","휴대폰","핸드폰","아이폰","갤럭시"] },
+  { hs6:"851830", titleKo:"헤드폰·이어폰 (블루투스 포함)", title:"Headphones & earphones (incl. bluetooth)", chapter:"85",
+    kw:["headphone","earphone","earbuds","bluetooth","wireless earphones","airpods"], kwKo:["헤드폰","이어폰","이어버드","블루투스이어폰","무선이어폰","에어팟"] },
+  { hs6:"852580", titleKo:"디지털 카메라·캠코더", title:"Digital cameras, camcorders", chapter:"85",
+    kw:["camera","digital camera","camcorder","video camera"], kwKo:["카메라","디카","캠코더","비디오카메라"] },
+  { hs6:"852872", titleKo:"컬러 TV 수신기", title:"Color TV reception apparatus", chapter:"85",
+    kw:["tv","television","smart tv","led tv"], kwKo:["티비","텔레비전","TV","스마트티비"] },
+  { hs6:"870321", titleKo:"승용차 (가솔린, ≤1000cc)", title:"Cars, gasoline, ≤1000 cc", chapter:"87",
+    kw:["car","passenger car","sedan","automobile"], kwKo:["자동차","승용차","차량","세단"] },
+  { hs6:"871200", titleKo:"자전거 (인력)", title:"Bicycles, non-motorised", chapter:"87",
+    kw:["bicycle","bike","cycle"], kwKo:["자전거","사이클","MTB"] },
+  { hs6:"900410", titleKo:"선글라스", title:"Sunglasses", chapter:"90",
+    kw:["sunglasses","shades"], kwKo:["선글라스","썬글라스"] },
+  { hs6:"901890", titleKo:"기타 의료·외과기기", title:"Other medical/surgical instruments", chapter:"90",
+    kw:["medical device","surgical","diagnostic"], kwKo:["의료기기","수술기구","진단기기"] },
+  { hs6:"910219", titleKo:"전기식 손목시계 (스마트워치)", title:"Smartwatches/electric wrist-watches", chapter:"91",
+    kw:["smartwatch","wristwatch","apple watch","watch"], kwKo:["스마트워치","손목시계","애플워치","갤럭시워치"] },
+  { hs6:"940360", titleKo:"기타 목재 가구", title:"Other wooden furniture", chapter:"94",
+    kw:["wooden furniture","wood table","wood desk","wood chair"], kwKo:["목재가구","원목가구","나무책상","원목테이블"] },
+  { hs6:"950300", titleKo:"완구·인형·퍼즐", title:"Toys, dolls, puzzles", chapter:"95",
+    kw:["toy","doll","puzzle","stuffed animal","kids toy"], kwKo:["장난감","완구","인형","퍼즐","유아용품"] },
+  { hs6:"950450", titleKo:"비디오 게임 콘솔", title:"Video game consoles", chapter:"95",
+    kw:["game console","playstation","xbox","nintendo","switch","gaming"], kwKo:["게임기","콘솔","플스","엑박","닌텐도","스위치"] },
+];
+
+const I18N = {
+  ko: {
+    title:"🌐 전세계 HS Code 검색",
+    subtitle:"제품 설명을 입력하면 국제 6자리 HS 코드와 국가별 자릿수 코드를 추정해 드립니다.",
+    placeholder:"예: 무선 블루투스 이어폰, 즉석 라면, 스테인리스 텀블러…",
+    countriesLabel:"비교할 국가",
+    examplesLabel:"추천 예시",
+    selAll:"전체", selNone:"초기화",
+    go:"🔎 검색",
+    empty:"제품을 자세히 적을수록(재질·용도·브랜드) 정확도가 올라갑니다.",
+    mode:"사전 모드 · 0 KB · 무료",
+    digits:n=>`${n}자리`,
+    confidence:"신뢰도", chapter:"류", heading:"호", subheading:"소호",
+    rationale:"분류 근거", alternates:"대체 후보", national:"국가별 코드",
+    country:"국가", code:"코드", name:"품명", note:"비고",
+    nomatch:"일치하는 항목이 없습니다. 더 일반적인 단어로 시도해 보세요 (예: 라면, 스마트폰, 화장품).",
+    rationaleText:"내장 사전의 한·영 키워드 점수가 가장 높은 항목을 선택했습니다 (GIR 1). 국가별 코드는 6자리에 0 패딩한 근사값입니다.",
+    warn:"이 결과는 보조용입니다. 통관 신고 전 반드시 관세 당국 또는 관세사 확인이 필요합니다.",
+    lang:"EN",
+    ex:["무선 블루투스 이어폰","스테인리스 텀블러","즉석 라면","면 100% 티셔츠","리튬이온 배터리","원두 커피","스마트폰","김치 1kg"],
+  },
+  en: {
+    title:"🌐 Global HS Code Search",
+    subtitle:"Type a product description to estimate the WCO 6-digit HS code and national code lengths.",
+    placeholder:"e.g. wireless bluetooth earphones, instant ramen, stainless tumbler…",
+    countriesLabel:"Compare countries",
+    examplesLabel:"Try an example",
+    selAll:"All", selNone:"Clear",
+    go:"🔎 Search",
+    empty:"More detail (material, use, brand) → better classification.",
+    mode:"Dictionary mode · 0 KB · Free",
+    digits:n=>`${n} digits`,
+    confidence:"Confidence", chapter:"Chapter", heading:"Heading", subheading:"Subheading",
+    rationale:"Rationale", alternates:"Alternates", national:"National codes",
+    country:"Country", code:"Code", name:"Title", note:"Notes",
+    nomatch:"No match. Try more common keywords (e.g. ramen, smartphone, cosmetics).",
+    rationaleText:"Selected the entry with the highest keyword score (GIR 1). National codes are 6-digit zero-padded approximations.",
+    warn:"This is an aid only. Always verify with the customs authority before declaration.",
+    lang:"한국어",
+    ex:["wireless bluetooth earphones","stainless tumbler","instant ramen","100% cotton t-shirt","lithium ion battery","coffee beans","smartphone","kimchi 1kg"],
+  },
+};
+
+let LOCALE = "ko";
+let SELECTED = ["KR","US","CN","JP","EU"];
+
+function t() { return I18N[LOCALE]; }
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[c])); }
+
+function tokenize(s) {
+  const norm = s.toLowerCase().replace(/[\s\-_/().,]+/g," ").trim();
+  const parts = norm.split(/\s+/).filter(Boolean);
+  const grams = new Set(parts);
+  for (const p of parts) {
+    if (/[가-힣]/.test(p) && p.length >= 2) {
+      for (let len = 2; len <= Math.min(p.length, 5); len++) {
+        for (let i = 0; i + len <= p.length; i++) grams.add(p.slice(i, i + len));
+      }
+    }
+  }
+  return [...grams];
+}
+
+function score(entry, tokens) {
+  const hay = [...entry.kw.map(x=>x.toLowerCase()), ...entry.kwKo, entry.title.toLowerCase(), entry.titleKo];
+  let s = 0;
+  for (const tk of tokens) {
+    if (!tk) continue;
+    for (const h of hay) {
+      if (!h) continue;
+      if (h === tk) s += 5;
+      else if (h.includes(tk)) s += 2;
+      else if (tk.length >= 3 && tk.includes(h)) s += 1;
+    }
+  }
+  return s;
+}
+
+function pad(hs6, digits) { return digits <= 6 ? hs6.slice(0, digits) : hs6 + "0".repeat(digits - 6); }
+
+function search(q) {
+  const tokens = tokenize(q);
+  const ranked = HS_DB.map(e => ({ e, s: score(e, tokens) })).filter(x => x.s > 0)
+                      .sort((a,b) => b.s - a.s);
+  if (!ranked.length) return null;
+  const top = ranked[0].e;
+  const conf = Math.min(0.85, 0.35 + ranked[0].s * 0.06);
+  const alts = ranked.slice(1, 4).map(r => ({ hs6: r.e.hs6, title: LOCALE==="ko" ? r.e.titleKo : r.e.title, score: r.s }));
+  const national = SELECTED.map(cc => {
+    const meta = COUNTRIES.find(c => c.code === cc);
+    return { country: cc, meta, code: pad(top.hs6, meta.digits) };
+  });
+  return { top, conf, alts, national };
+}
+
+function renderCountries() {
+  const el = document.getElementById("countries");
+  el.innerHTML = "";
+  for (const c of COUNTRIES) {
+    const div = document.createElement("div");
+    div.className = "chip" + (SELECTED.includes(c.code) ? " active" : "");
+    div.innerHTML = `<span>${c.flag}</span><span>${LOCALE==="ko" ? c.nameKo : c.name}</span><span class="digits">${t().digits(c.digits)}</span>`;
+    div.onclick = () => {
+      SELECTED = SELECTED.includes(c.code) ? SELECTED.filter(x=>x!==c.code) : [...SELECTED, c.code];
+      renderCountries();
+    };
+    el.appendChild(div);
+  }
+  document.getElementById("cntCnt").textContent = SELECTED.length;
+}
+
+function renderExamples() {
+  const el = document.getElementById("examples");
+  el.innerHTML = "";
+  for (const ex of t().ex) {
+    const span = document.createElement("span");
+    span.className = "ex";
+    span.textContent = ex;
+    span.onclick = () => { document.getElementById("q").value = ex; };
+    el.appendChild(span);
+  }
+}
+
+function renderText() {
+  const T = t();
+  document.getElementById("title").textContent = T.title;
+  document.getElementById("subtitle").textContent = T.subtitle;
+  document.getElementById("q").placeholder = T.placeholder;
+  document.getElementById("countriesLabel").innerHTML = `${T.countriesLabel} (<span id="cntCnt">${SELECTED.length}</span>)`;
+  document.getElementById("examplesLabel").textContent = T.examplesLabel;
+  document.getElementById("selAll").textContent = T.selAll;
+  document.getElementById("selNone").textContent = T.selNone;
+  document.getElementById("goBtn").textContent = T.go;
+  document.getElementById("empty").textContent = T.empty;
+  document.getElementById("modeLabel").textContent = T.mode;
+  document.getElementById("langBtn").textContent = T.lang;
+  document.title = T.title;
+}
+
+function renderResult(r) {
+  const T = t();
+  const el = document.getElementById("result");
+  document.getElementById("empty").hidden = true;
+  el.hidden = false;
+
+  if (!r) {
+    el.innerHTML = `<div class="glass"><p style="margin:0;color:#fbbf24">${T.nomatch}</p></div>`;
+    return;
+  }
+
+  const conf = Math.round(r.conf * 100);
+  const title = LOCALE === "ko" ? r.top.titleKo : r.top.title;
+  const heading = r.top.hs6.slice(0,4);
+
+  el.innerHTML = `
+    <div class="glass">
+      <div class="row" style="gap:12px;align-items:baseline">
+        <span class="hs-pill">${r.top.hs6}</span>
+        <span style="font-size:16px">${escapeHtml(title)}</span>
+      </div>
+      <div class="grid4">
+        <div class="field"><div class="k">${T.chapter}</div><div class="v">${r.top.chapter}</div></div>
+        <div class="field"><div class="k">${T.heading}</div><div class="v">${heading}</div></div>
+        <div class="field"><div class="k">${T.subheading}</div><div class="v">${r.top.hs6}</div></div>
+        <div class="field"><div class="k">${T.confidence}</div>
+          <div class="bar"><i style="width:${conf}%"></i></div>
+          <div style="text-align:right;font-size:12px;margin-top:2px">${conf}%</div>
+        </div>
+      </div>
+      <div class="field" style="margin-top:10px"><div class="k">${T.rationale}</div>
+        <div style="margin-top:4px;font-size:13px;color:#cbd5e1">${T.rationaleText}</div></div>
+      <p class="warn">⚠ ${T.warn}</p>
+    </div>
+
+    <div class="glass" style="margin-top:12px">
+      <h3 style="margin:0 0 6px;font-size:15px">${T.national}</h3>
+      <table>
+        <thead><tr><th>${T.country}</th><th>${T.code}</th><th>${T.name}</th></tr></thead>
+        <tbody>
+          ${r.national.map(n => `
+            <tr>
+              <td>${n.meta.flag} ${LOCALE==="ko" ? n.meta.nameKo : n.meta.name}<br><span style="font-size:11px;color:#94a3b8">${n.meta.schedule}</span></td>
+              <td><span class="code">${n.code}</span></td>
+              <td>${escapeHtml(title)}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+
+    ${r.alts.length ? `
+      <div class="glass" style="margin-top:12px">
+        <h3 style="margin:0 0 6px;font-size:15px">${T.alternates}</h3>
+        ${r.alts.map(a => `
+          <div class="alt-li">
+            <span class="code">${a.hs6}</span>
+            <span>${escapeHtml(a.title)}</span>
+            <span style="margin-left:auto;color:#94a3b8;font-size:11px">score ${a.score}</span>
+          </div>
+        `).join("")}
+      </div>
+    ` : ""}
+  `;
+}
+
+document.getElementById("goBtn").onclick = () => {
+  const q = document.getElementById("q").value.trim();
+  if (!q || SELECTED.length === 0) return;
+  renderResult(search(q));
+};
+document.getElementById("q").addEventListener("keydown", e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === "Enter") document.getElementById("goBtn").click();
+});
+document.getElementById("selAll").onclick = () => { SELECTED = COUNTRIES.map(c=>c.code); renderCountries(); };
+document.getElementById("selNone").onclick = () => { SELECTED = []; renderCountries(); };
+document.getElementById("langBtn").onclick = () => {
+  LOCALE = LOCALE === "ko" ? "en" : "ko";
+  document.documentElement.lang = LOCALE;
+  renderText(); renderCountries(); renderExamples();
+};
+
+renderText();
+renderCountries();
+renderExamples();
+</script>
+</body>
+</html>
