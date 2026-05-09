@@ -18,9 +18,10 @@ AI 기반(Anthropic Claude)으로 제품 설명을 받아 **국제 HS 6자리 �
 아래 버튼을 **핸드폰에서 탭** → GitHub 로그인 → `ANTHROPIC_API_KEY` 입력 → Deploy.
 3분 안에 `https://<프로젝트명>.vercel.app` URL이 나옵니다.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fcilclaude2026%2Fhscode&env=ANTHROPIC_API_KEY&envDescription=Anthropic%20Console%EC%97%90%EC%84%9C%20%EB%B0%9C%EA%B8%89%EB%B0%9B%EC%9D%80%20API%20%ED%82%A4&envLink=https%3A%2F%2Fconsole.anthropic.com%2Fsettings%2Fkeys&project-name=hscode-search&repository-name=hscode-search)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fcilclaude2026%2Fhscode&project-name=hscode-search&repository-name=hscode-search)
 
-> 가져오기(Import) 화면에서 Production Branch 를 `claude/ai-hscode-search-app-NSrhL` 로 선택하세요. (현재 유일한 브랜치)
+> - Production Branch: `claude/ai-hscode-search-app-NSrhL` (현재 유일한 브랜치)
+> - 환경변수는 **선택사항**입니다. 비워두면 내장 사전 모드로 동작하고, 나중에 `ANTHROPIC_API_KEY` 를 추가하면 AI 모드로 전환됩니다.
 
 ### Cloudflare Pages 로 올리기 (대안)
 
@@ -38,11 +39,20 @@ npm run dev -- -H 0.0.0.0       # 같은 Wi-Fi 의 핸드폰에서도 접속 가
 # → http://<PC-LAN-IP>:3000
 ```
 
+## 동작 모드
+
+| 모드 | 조건 | 정확도 | 비용 |
+|------|------|--------|------|
+| 🤖 **AI 모드**       | `ANTHROPIC_API_KEY` 환경변수 설정 시 | 높음 (GIR 추론) | API 호출당 |
+| 📚 **사전 모드(기본)** | 키 미설정 시 자동 폴백          | 보통 (50개 대표 품목) | 무료 |
+
+> Vercel 배포 시 환경변수 칸을 비워둬도 즉시 동작합니다. 나중에 키를 추가하고 Redeploy 하면 자동으로 AI 모드로 전환됩니다.
+
 ## 환경 변수
 
 | 변수 | 설명 | 기본값 |
 |------|------|--------|
-| `ANTHROPIC_API_KEY` | (필수) Anthropic API 키 | — |
+| `ANTHROPIC_API_KEY` | (선택) Anthropic API 키. 없으면 사전 모드 | — |
 | `ANTHROPIC_MODEL`   | 사용할 모델 ID | `claude-sonnet-4-6` |
 
 ## 폴더 구조

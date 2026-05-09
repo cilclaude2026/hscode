@@ -212,7 +212,7 @@ function ResultView({
           <h2 className="text-lg font-semibold text-white">{t.resultsTitle}</h2>
           {meta && (
             <span className="text-xs text-slate-400">
-              {meta.model} · {meta.latencyMs}ms
+              {meta.model.includes("builtin") ? "📚 사전 모드" : `🤖 ${meta.model}`} · {meta.latencyMs}ms
             </span>
           )}
         </div>
