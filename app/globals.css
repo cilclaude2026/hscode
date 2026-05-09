@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light dark;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(59, 130, 246, 0.18), transparent 60%),
+    radial-gradient(900px 500px at -10% 10%, rgba(139, 92, 246, 0.15), transparent 60%),
+    #0b1020;
+  color: #e5e7eb;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Apple SD Gothic Neo",
+    "Noto Sans KR", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.glass {
+  background: rgba(17, 24, 39, 0.55);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.code-pill {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: 0.04em;
+}
